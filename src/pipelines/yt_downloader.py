@@ -1,28 +1,32 @@
-from yt_dlp import YoutubeDL
-import cv2
 import os
+
+import cv2
+from yt_dlp import YoutubeDL
+
 
 def create_folder(folder_path):
     """Creates a folder if it does not exist."""
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
 
+
 # Function to download video from YouTube
 def download_video(url, output_folder="downloads"):
     create_folder(output_folder)  # Ensure the folder for downloaded videos exists
     download_path = os.path.join(output_folder, "downloaded_video.mp4")
-    
+
     ydl_opts = {
         "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
         "outtmpl": download_path,
-        "merge_output_format": "mp4"
+        "merge_output_format": "mp4",
     }
-    
+
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
-    
+
     print(f"Video downloaded to {download_path}")
     return download_path
+
 
 # Function to extract frames every 60 seconds
 def extract_frames(video_path, output_folder="frames"):
@@ -54,10 +58,11 @@ def extract_frames(video_path, output_folder="frames"):
 
     cap.release()
 
+
 # Example usage
 if __name__ == "__main__":
     video_url = "https://www.youtube.com/watch?v=h4NwRcDnyFw&ab_channel=sthithapragna"  # Change to your video URL
-    
+
     # Download video
     video_path = download_video(video_url, output_folder="downloads")
 

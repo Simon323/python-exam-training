@@ -5,3 +5,6 @@ opencv-python
 # pytubefix
 # pytube
 yt-dlp
+black
+isort
+flake8
