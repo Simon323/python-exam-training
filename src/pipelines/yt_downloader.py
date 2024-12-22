@@ -1,4 +1,4 @@
-from pytubefix import YouTube
+from yt_dlp import YoutubeDL
 import cv2
 import os
 
@@ -11,9 +11,16 @@ def create_folder(folder_path):
 def download_video(url, output_folder="downloads"):
     create_folder(output_folder)  # Ensure the folder for downloaded videos exists
     download_path = os.path.join(output_folder, "downloaded_video.mp4")
-    yt = YouTube(url)
-    stream = yt.streams.get_highest_resolution()  # Download the video in the highest quality
-    stream.download(output_path=output_folder, filename="downloaded_video.mp4")
+    
+    ydl_opts = {
+        "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+        "outtmpl": download_path,
+        "merge_output_format": "mp4"
+    }
+    
+    with YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
+    
     print(f"Video downloaded to {download_path}")
     return download_path
 
