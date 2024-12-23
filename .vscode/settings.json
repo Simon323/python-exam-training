@@ -10,12 +10,13 @@
 
   // Konfiguracja Black
   "python.formatting.blackArgs": [
-      "--line-length", "88"  // Maksymalna długość linii zgodnie z PEP 8
+    "--line-length",
+    "88" // Maksymalna długość linii zgodnie z PEP 8
   ],
 
   // Automatyczne sortowanie importów
   "editor.codeActionsOnSave": {
-      "source.organizeImports": true
+    "source.organizeImports": "explicit"
   },
 
   // Flake8 dla lintingu
@@ -23,7 +24,5 @@
   "python.linting.flake8Enabled": true,
 
   // Ignorowanie błędów E501 (przekroczenie długości linii)
-  "python.linting.flake8Args": [
-      "--ignore=E501"
-  ]
+  "python.linting.flake8Args": ["--ignore=E501"]
 }

@@ -57,7 +57,13 @@ def download_video(url, output_folder="downloads", filename=None):
 
 # Function to extract frames at a specified interval
 def extract_frames(video_path, output_folder="frames", interval=60):
-    create_folder(output_folder)  # Ensure the folder for frames exists
+    # Extract the base name of the video file and convert to snake_case for folder name
+    video_name = os.path.splitext(os.path.basename(video_path))[0]
+    video_folder = to_snake_case(video_name)
+
+    # Create a subfolder for the video's frames
+    video_output_folder = os.path.join(output_folder, video_folder)
+    create_folder(video_output_folder)
 
     # Open the video file
     cap = cv2.VideoCapture(video_path)
@@ -76,8 +82,8 @@ def extract_frames(video_path, output_folder="frames", interval=60):
         ret, frame = cap.read()
 
         if ret:
-            # Save frame to file
-            frame_filename = os.path.join(output_folder, f"frame_{sec}s.png")
+            # Save frame to file in the subfolder
+            frame_filename = os.path.join(video_output_folder, f"frame_{sec}s.png")
             cv2.imwrite(frame_filename, frame)
             print(f"Frame at {sec} seconds saved as {frame_filename}")
         else:
