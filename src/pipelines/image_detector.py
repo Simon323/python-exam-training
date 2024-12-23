@@ -1,11 +1,13 @@
+import json
 import os
 import re
+import uuid
 
 import pytesseract
 from PIL import Image
 
 
-def extract_text_from_images(directory_path):
+def extract_text_from_images(directory_path, output_directory="questions"):
     # Sprawdź, czy katalog istnieje
     if not os.path.isdir(directory_path):
         print("Podana ścieżka nie jest katalogiem.")
@@ -21,6 +23,12 @@ def extract_text_from_images(directory_path):
     if not image_files:
         print("Brak plików graficznych w katalogu.")
         return
+
+    # Utwórz katalog na wyniki, jeśli nie istnieje
+    verified_dir = os.path.join(output_directory, "verified")
+    issued_dir = os.path.join(output_directory, "issued")
+    os.makedirs(verified_dir, exist_ok=True)
+    os.makedirs(issued_dir, exist_ok=True)
 
     # Iteruj przez pliki graficzne
     for image_file in image_files:
@@ -71,13 +79,28 @@ def extract_text_from_images(directory_path):
             # Obiekt wynikowy
             result = {"question": question, "answers": answers}
 
-            # Wyświetl wynik dla bieżącego pliku
-            print(f"Wynik dla pliku {image_file}:")
-            print(result)
+            # Sprawdź, czy pytanie zaczyna się numerem
+            question_id = None
+            question_match = re.match(r"^(\d+)[ \.]", question)
+            if question_match:
+                question_id = question_match.group(1)
+
+            # Określ katalog zapisu
+            output_dir = verified_dir if question_id else issued_dir
+
+            # Wygeneruj nazwę pliku
+            file_name = f"{question_id}.json" if question_id else f"{uuid.uuid4()}.json"
+            file_path = os.path.join(output_dir, file_name)
+
+            # Zapisz wynik do pliku JSON
+            with open(file_path, "w", encoding="utf-8") as json_file:
+                json.dump(result, json_file, ensure_ascii=False, indent=4)
+
+            print(f"Wynik zapisany w pliku: {file_path}")
 
         except Exception as e:
             print(f"Błąd podczas przetwarzania pliku {image_file}: {e}")
 
 
 # Przykład użycia
-# extract_text_from_images("ścieżka/do/katalogu")
+# extract_text_from_images("ścieżka/do/katalogu", "ścieżka/do/questions")
