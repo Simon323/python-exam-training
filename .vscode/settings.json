@@ -1,28 +1,31 @@
 {
-  // Ścieżka do interpretera Pythona
+  // Path to the Python interpreter
   "python.pythonPath": "venv/bin/python",
 
-  // Automatyczne formatowanie kodu przy zapisie
+  // Automatic code formatting on save
   "editor.formatOnSave": true,
 
-  // Ustawienie formatera (Black)
+  // Set formatter (Black)
   "python.formatting.provider": "black",
 
-  // Konfiguracja Black
+  // Black configuration
   "python.formatting.blackArgs": [
     "--line-length",
-    "88" // Maksymalna długość linii zgodnie z PEP 8
+    "88" // Maximum line length according to PEP 8
   ],
 
-  // Automatyczne sortowanie importów
+  // Automatic import sorting
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit"
   },
 
-  // Flake8 dla lintingu
+  // Flake8 for linting
   "python.linting.enabled": true,
   "python.linting.flake8Enabled": true,
 
-  // Ignorowanie błędów E501 (przekroczenie długości linii)
-  "python.linting.flake8Args": ["--ignore=E501"]
+  // Ignore E501 errors (line length exceeded)
+  "python.linting.flake8Args": ["--ignore=E501"],
+
+  // Optimal color scheme for Python syntax highlighting
+  "workbench.colorTheme": "Monokai"
 }
