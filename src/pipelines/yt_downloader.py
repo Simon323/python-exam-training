@@ -91,6 +91,8 @@ def extract_frames(video_path, output_folder="frames", interval=60):
 
     cap.release()
 
+    return video_output_folder
+
 
 # Example usage
 if __name__ == "__main__":

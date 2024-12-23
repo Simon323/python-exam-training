@@ -12,4 +12,6 @@ if __name__ == "__main__":
     video_path = download_video(video_url, output_folder=downloads_folder)
 
     # Extract frames and save them in the frames directory
-    extract_frames(video_path, output_folder=frames_folder, interval=frame_interval)
+    frames_folder = extract_frames(
+        video_path, output_folder=frames_folder, interval=frame_interval
+    )
