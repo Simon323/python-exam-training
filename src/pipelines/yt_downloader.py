@@ -55,8 +55,8 @@ def download_video(url, output_folder="downloads", filename=None):
     return download_path
 
 
-# Function to extract frames every 60 seconds
-def extract_frames(video_path, output_folder="frames"):
+# Function to extract frames at a specified interval
+def extract_frames(video_path, output_folder="frames", interval=60):
     create_folder(output_folder)  # Ensure the folder for frames exists
 
     # Open the video file
@@ -67,8 +67,8 @@ def extract_frames(video_path, output_folder="frames"):
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))  # total number of frames
     duration = total_frames / fps  # video duration in seconds
 
-    # Extract frames every 60 seconds
-    for sec in range(0, int(duration), 60):
+    # Extract frames at the specified interval
+    for sec in range(0, int(duration), interval):
         # Set frame position
         cap.set(cv2.CAP_PROP_POS_FRAMES, sec * fps)
 
@@ -93,5 +93,5 @@ if __name__ == "__main__":
     # Download video
     video_path = download_video(video_url, output_folder="downloads")
 
-    # Extract frames
-    extract_frames(video_path, output_folder="frames")
+    # Extract frames every 60 seconds
+    extract_frames(video_path, output_folder="frames", interval=60)
