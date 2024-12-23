@@ -8,12 +8,12 @@ from PIL import Image
 
 
 def extract_text_from_images(directory_path, output_directory="questions"):
-    # Sprawdź, czy katalog istnieje
+    # Check if the directory exists
     if not os.path.isdir(directory_path):
-        print("Podana ścieżka nie jest katalogiem.")
+        print("The provided path is not a directory.")
         return
 
-    # Pobierz listę plików graficznych w katalogu
+    # Get the list of image files in the directory
     image_files = [
         f
         for f in os.listdir(directory_path)
@@ -21,86 +21,99 @@ def extract_text_from_images(directory_path, output_directory="questions"):
     ]
 
     if not image_files:
-        print("Brak plików graficznych w katalogu.")
+        print("No image files in the directory.")
         return
 
-    # Utwórz katalog na wyniki, jeśli nie istnieje
+    # Create directories for results if they do not exist
     verified_dir = os.path.join(output_directory, "verified")
     issued_dir = os.path.join(output_directory, "issued")
     os.makedirs(verified_dir, exist_ok=True)
     os.makedirs(issued_dir, exist_ok=True)
 
-    # Iteruj przez pliki graficzne
+    # Iterate through the image files
     for image_file in image_files:
-        image_path = os.path.join(directory_path, image_file)
+        image_path = os.path.join(directory_path, image_file).replace("\\", "/")
         try:
-            # Wczytaj obraz
+            # Load the image
             image = Image.open(image_path)
 
-            # Wyodrębnij tekst z obrazu
+            # Extract text from the image
             text = pytesseract.image_to_string(image)
 
-            # Rozdziel tekst na linie
+            # Split the text into lines
             lines = text.strip().split("\n")
             question_lines = []
             answers = []
             current_answer = None
 
-            # Flaga oznaczająca, czy zaczęliśmy przetwarzać odpowiedzi
+            # Flag indicating whether we have started processing answers
             in_answers_section = False
 
             for line in lines:
                 line = line.strip()
 
-                # Sprawdź, czy linia zaczyna się od litery odpowiedzi (np. "A.", "B.", itd.)
-                match = re.match(r"^[A-D]\.\s", line)
+                # Check if the line starts with an answer letter (e.g., "A.", "B.", etc.)
+                match = re.match(r"^[A-D]\.", line)
 
                 if match:
-                    # Jeśli jest to nowa odpowiedź, zapisz poprzednią odpowiedź
+                    # If it's a new answer, save the previous answer
                     if current_answer:
                         answers.append(current_answer)
-                    # Rozpocznij nową odpowiedź
+                    # Start a new answer
                     current_answer = line
                     in_answers_section = True
                 elif in_answers_section:
-                    # Dodaj linie do bieżącej odpowiedzi, jeśli już zaczęliśmy część odpowiedzi
+                    # Add lines to the current answer if we have started the answers section
                     current_answer += " " + line
                 else:
-                    # Dodaj linie do pytania, jeśli jesteśmy nadal w sekcji pytania
+                    # Add lines to the question if we are still in the question section
                     question_lines.append(line)
 
-            # Dodaj ostatnią odpowiedź do listy
+            # Add the last answer to the list
             if current_answer:
                 answers.append(current_answer)
 
-            # Złóż pytanie w jeden ciąg tekstowy
+            # Combine the question into a single text string
             question = " ".join(question_lines)
 
-            # Obiekt wynikowy
-            result = {"question": question, "answers": answers}
-
-            # Sprawdź, czy pytanie zaczyna się numerem
+            # Check if the question starts with a number
             question_id = None
             question_match = re.match(r"^(\d+)[ \.]", question)
             if question_match:
-                question_id = question_match.group(1)
+                question_id = int(question_match.group(1))
 
-            # Określ katalog zapisu
+            # Process the answers
+            processed_answers = []
+            for idx, answer in enumerate(answers):
+                answer_id = chr(97 + idx)  # "a", "b", "c", "d", etc.
+                processed_answers.append(
+                    {"id": answer_id, "answer": answer, "isCorrect": False}
+                )
+
+            # Result object
+            result = {
+                "questionId": question_id,
+                "question": question,
+                "answers": processed_answers,
+                "source": image_path,
+            }
+
+            # Determine the save directory
             output_dir = verified_dir if question_id else issued_dir
 
-            # Wygeneruj nazwę pliku
+            # Generate the file name
             file_name = f"{question_id}.json" if question_id else f"{uuid.uuid4()}.json"
             file_path = os.path.join(output_dir, file_name)
 
-            # Zapisz wynik do pliku JSON
+            # Save the result to a JSON file
             with open(file_path, "w", encoding="utf-8") as json_file:
                 json.dump(result, json_file, ensure_ascii=False, indent=4)
 
-            print(f"Wynik zapisany w pliku: {file_path}")
+            print(f"Result saved in file: {file_path}")
 
         except Exception as e:
-            print(f"Błąd podczas przetwarzania pliku {image_file}: {e}")
+            print(f"Error processing file {image_file}: {e}")
 
 
-# Przykład użycia
-# extract_text_from_images("ścieżka/do/katalogu", "ścieżka/do/questions")
+# Example usage
+# extract_text_from_images("path/to/directory", "path/to/questions")

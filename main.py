@@ -1,4 +1,9 @@
-from src.pipelines import download_video, extract_frames, extract_text_from_images
+from src.pipelines import (
+    download_video,
+    extract_frames,
+    extract_text_from_images,
+    merge_json_files,
+)
 
 if __name__ == "__main__":
     # video_url = (
@@ -16,6 +21,11 @@ if __name__ == "__main__":
     #     video_path, output_folder=frames_folder, interval=frame_interval
     # )
 
-    frames_folder = "frames/aws_certified_devops_professional_exam_practice_questions_quizset_2_dop_c02"  # Subfolder for extracted frames/frames
     # Extract text from images in the frames directory
-    extract_text_from_images(frames_folder)
+    # frames_folder = "frames/aws_certified_devops_professional_exam_practice_questions_quizset_2_dop_c02"  # Subfolder for extracted frames/frames
+    # # Extract text from images in the frames directory
+    # extract_text_from_images(frames_folder)
+
+    # Merge JSON files with questions
+
+    merge_json_files("questions/verified")
