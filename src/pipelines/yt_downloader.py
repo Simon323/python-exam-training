@@ -10,17 +10,44 @@ def create_folder(folder_path):
         os.makedirs(folder_path)
 
 
-# Function to download video from YouTube
-def download_video(url, output_folder="downloads"):
-    create_folder(output_folder)  # Ensure the folder for downloaded videos exists
-    download_path = os.path.join(output_folder, "downloaded_video.mp4")
+def to_snake_case(name):
+    """Convert a string to snake_case."""
+    return "_".join("".join(c if c.isalnum() else " " for c in name).split()).lower()
 
+
+def download_video(url, output_folder="downloads", filename=None):
+    """
+    Download a video from a given URL.
+
+    Parameters:
+    - url: str - The URL of the video to download.
+    - output_folder: str - The folder where the video will be saved.
+    - filename: str (optional) - The desired name for the output file (without extension).
+
+    Returns:
+    - str: The path to the downloaded video.
+    """
+    create_folder(output_folder)  # Ensure the folder for downloaded videos exists
+
+    # If no filename is provided, use the title from the video
+    if filename is None:
+        ydl_opts = {"quiet": True}
+        with YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(url, download=False)
+            filename = info_dict.get("title", "downloaded_video")
+
+    # Convert filename to snake_case and set the full download path
+    sanitized_filename = to_snake_case(filename)
+    download_path = os.path.join(output_folder, f"{sanitized_filename}.mp4")
+
+    # Configure download options
     ydl_opts = {
         "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
         "outtmpl": download_path,
         "merge_output_format": "mp4",
     }
 
+    # Download the video
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
 
